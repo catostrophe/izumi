@@ -8,6 +8,7 @@ import izumi.distage.model.definition.StandardAxis._
 import izumi.distage.plugins.PluginDef
 import izumi.distage.roles.test.fixtures.Fixture._
 import izumi.distage.roles.test.fixtures.ResourcesPlugin._
+import izumi.fundamentals.platform.functional.Identity
 
 class ConflictPlugin extends PluginDef {
   make[Conflict].tagged(Env.Prod).from[Conflict1]
@@ -20,13 +21,27 @@ class ConflictPlugin extends PluginDef {
 
 class ResourcesPluginBase extends ModuleDef {
   make[ExecutorService].from(Executors.newCachedThreadPool())
+
+  make[IntegrationResource1[Identity]]
+  make[JustResource1[Identity]]
+  make[JustResource2[Identity]]
+  make[ProbeResource0[Identity]]
+  make[JustResource3[Identity]]
+
+  many[TestResource[Identity]]
+    .ref[IntegrationResource1[Identity]]
+    .ref[JustResource1[Identity]]
+    .ref[JustResource2[Identity]]
+    .ref[ProbeResource0[Identity]]
+    .ref[JustResource3[Identity]]
+
   make[IntegrationResource1[IO]]
   make[JustResource1[IO]]
   make[JustResource2[IO]]
   make[ProbeResource0[IO]]
   make[JustResource3[IO]]
 
-  many[TestResource]
+  many[TestResource[IO]]
     .ref[IntegrationResource1[IO]]
     .ref[JustResource1[IO]]
     .ref[JustResource2[IO]]
@@ -38,7 +53,7 @@ class ResourcesPlugin extends ResourcesPluginBase with PluginDef {
   make[XXX_ResourceEffectsRecorder[IO]]
 
   make[IntegrationResource0[IO]]
-  many[TestResource]
+  many[TestResource[IO]]
     .ref[IntegrationResource0[IO]]
 }
 

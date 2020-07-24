@@ -36,7 +36,7 @@ object roles {
     val conf2: TestServiceConf2,
     val dummies: Set[Dummy],
     val resource: TestRole00Resource[F],
-    val resources: Set[TestResource],
+    val resources: Set[TestResource[F]],
     val conflict: Conflict,
     val es: ExecutorService,
     val counter: XXX_ResourceEffectsRecorder[F],
