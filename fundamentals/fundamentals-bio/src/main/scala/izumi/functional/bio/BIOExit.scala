@@ -1,6 +1,7 @@
 package izumi.functional.bio
 
 import zio.{Cause, Exit, FiberFailure}
+import monix.bio
 
 sealed trait BIOExit[+E, +A]
 
@@ -92,6 +93,23 @@ object BIOExit {
       }
     }
 
+  }
+
+  object MonixExit {
+    @inline def toIzBIO[E, A](exit: Either[Option[bio.Cause[E]], A]): BIOExit[E, A] = {
+      exit match {
+        case Left(None) => Termination(new Throwable("The task was cancelled."), Trace.empty)
+        case Left(Some(error)) => fromMonixCause(error)
+        case Right(value) => Success(value)
+      }
+    }
+
+    @inline def fromMonixCause[E](cause: bio.Cause[E]): BIOExit.Failure[E] = {
+      cause match {
+        case bio.Cause.Error(value) => BIOExit.Error(value, Trace.empty)
+        case bio.Cause.Termination(value) => BIOExit.Termination(value, Trace.empty)
+      }
+    }
   }
 
 }
